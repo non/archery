@@ -72,28 +72,64 @@ case class RTree[A](root: Node[A], size: Int) {
     entries.foldLeft(this)(_ remove _)
 
   /**
-   * Return a sequence of all entries found in the given search space.
+   * Return a sequence of all entries found within the bounding box.
    */
   def search(space: Box): Seq[Entry[A]] =
     root.search(space, _ => true)
 
   /**
-   * Return a sequence of all entries found in the given search space.
+   * Return a sequence of all entries found within the bounding box.
    */
   def search(space: Box, f: Entry[A] => Boolean): Seq[Entry[A]] =
     root.search(space, f)
 
   /**
-   * Return a sequence of all entries intersecting the given search space.
+   * Return a sequence of all entries found within the bounding circle.
+   */
+  def search(p: Point, radius: Float): Seq[Entry[A]] = {
+    val r2 = radius * radius
+    val space = Box(p.x - radius, p.y - radius, p.x + radius, p.y + radius)
+    root.search(space, _.geom.maxDistanceSquared(p) <= r2)
+  }
+
+  /**
+   * Return a sequence of all entries found within the bounding circle.
+   */
+  def search(p: Point, radius: Float, f: Entry[A] => Boolean): Seq[Entry[A]] = {
+    val r2 = radius * radius
+    val space = Box(p.x - radius, p.y - radius, p.x + radius, p.y + radius)
+    root.search(space, e => e.geom.maxDistanceSquared(p) <= r2 && f(e))
+  }
+
+  /**
+   * Return a sequence of all entries intersecting the bounding box.
    */
   def searchIntersection(space: Box): Seq[Entry[A]] =
     root.searchIntersection(space, _ => true)
 
   /**
-   * Return a sequence of all entries intersecting the given search space.
+   * Return a sequence of all entries intersecting the bounding box.
    */
   def searchIntersection(space: Box, f: Entry[A] => Boolean): Seq[Entry[A]] =
     root.searchIntersection(space, f)
+
+  /**
+   * Return a sequence of all entries intersecting the bounding radius.
+   */
+  def searchIntersection(p: Point, radius: Float): Seq[Entry[A]] = {
+    val r2 = radius * radius
+    val space = Box(p.x - radius, p.y - radius, p.x + radius, p.y + radius)
+    root.searchIntersection(space, _.geom.distanceSquared(p) <= r2)
+  }
+
+  /**
+   * Return a sequence of all entries intersecting the bounding radius.
+   */
+  def searchIntersection(p: Point, radius: Float, f: Entry[A] => Boolean): Seq[Entry[A]] = {
+    val r2 = radius * radius
+    val space = Box(p.x - radius, p.y - radius, p.x + radius, p.y + radius)
+    root.searchIntersection(space, e => e.geom.distanceSquared(p) <= r2 && f(e))
+  }
 
   /**
    * Construct a result an initial value, the entries found in a

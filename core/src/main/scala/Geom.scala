@@ -30,6 +30,15 @@ sealed trait Geom {
     dx * dx + dy * dy
   }
 
+  def maxDistance(pt: Point): Double =
+    sqrt(maxDistanceSquared(pt))
+
+  def maxDistanceSquared(pt: Point): Double = {
+    val dx = (if (pt.x < (x2 + x) / 2) x2 - pt.x else pt.x - x).toDouble
+    val dy = (if (pt.y < (y2 + y) / 2) y2 - pt.y else pt.y - y).toDouble
+    dx * dx + dy * dy
+  }
+
   def isFinite: Boolean =
     !(isNaN(x) || isInfinite(x) ||
       isNaN(y) || isInfinite(y) ||
@@ -40,7 +49,14 @@ sealed trait Geom {
 
   def lowerLeft: Point = Point(x, y)
 
+  def lowerRight: Point = Point(x2, y)
+
+  def upperLeft: Point = Point(x, y2)
+
   def upperRight: Point = Point(x2, y2)
+
+  def corners: List[Point] =
+    lowerLeft :: lowerRight :: upperLeft :: upperRight :: Nil
 
   def contains(geom: Geom): Boolean =
     x <= geom.x && geom.x2 <= x2 && y <= geom.y && geom.y2 <= y2
@@ -78,6 +94,12 @@ case class Point(x: Float, y: Float) extends Geom {
     val dy = (pt.y - y).toDouble
     dx * dx + dy * dy
   }
+
+  override def maxDistance(pt: Point): Double =
+    sqrt(distanceSquared(pt))
+
+  override def maxDistanceSquared(pt: Point): Double =
+    distanceSquared(pt)
 }
 
 case class Box(x: Float, y: Float, x2: Float, y2: Float) extends Geom

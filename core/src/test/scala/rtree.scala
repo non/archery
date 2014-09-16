@@ -14,37 +14,11 @@ import Arbitrary.arbitrary
 
 class RTreeCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 
-  val xmin = -14030169.0F
-  val ymin =   2873645.0F
-  val xmax =  -7455361.0F
-  val ymax =   6226366.0F
-  val dx = xmax - ymin
-  val dy = ymax - ymin
-  
-  def isFinite(n: Float) = !n.isInfinite && !n.isNaN
-
-  implicit val arbpoint = Arbitrary(for {
-    x <- arbitrary[Float].suchThat(isFinite)
-    y <- arbitrary[Float].suchThat(isFinite)
-  } yield {
-    Point(xmin + dx * (x.abs % 1.0F), ymin + dy * (y.abs % 1.0F))
-  })
-
-  implicit val arbbox = Arbitrary(for {
-    x1 <- arbitrary[Float].suchThat(isFinite)
-    x2 <- arbitrary[Float].suchThat(isFinite)
-    y1 <- arbitrary[Float].suchThat(isFinite)
-    y2 <- arbitrary[Float].suchThat(isFinite)
-  } yield {
-    Box(min(x1, x2), min(y1, y2), max(x1, x2), max(y1, y2))
-  })
+  import GeomUtil._
 
   implicit val arbentry = Arbitrary(for {
-    either <- arbitrary[Either[Point, Box]]
-    n <- arbitrary[Int]
-  } yield {
-    Entry(either.fold(identity, identity), n)
-  })
+    g <- arbitrary[Geom]; n <- arbitrary[Int]
+  } yield Entry(g, n))
 
   def build(es: List[Entry[Int]]): RTree[Int] =
     es.foldLeft(RTree.empty[Int])(_ insert _)
@@ -121,7 +95,7 @@ class RTreeCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChec
     }
   }
 
-  property("rtree.search works") {
+  property("rtree.search by bbox works") {
     forAll { (es: List[Entry[Int]], p: Point) =>
       val rt = build(es)
 
@@ -131,6 +105,23 @@ class RTreeCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChec
       es.foreach { e =>
         val box2 = bound(e.geom, 10)
         rt.search(box2).toSet shouldBe es.filter(e => box2.contains(e.geom)).toSet
+      }
+    }
+  }
+
+  property("rtree.search by radius works") {
+    forAll { (es: List[Entry[Int]], p: Point) =>
+      val rt = build(es)
+      val radius = 10
+
+      def control(p: Point, radius: Int): Set[Entry[Int]] = {
+        es.filter(e => e.geom.maxDistance(p) <= radius).toSet
+      }
+
+      rt.search(p, radius).toSet shouldBe control(p, radius)
+      es.foreach { e =>
+        val p2 = e.geom.lowerLeft
+        rt.search(p2, radius).toSet shouldBe control(p2, radius)
       }
     }
   }
