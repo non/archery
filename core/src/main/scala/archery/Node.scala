@@ -1,7 +1,6 @@
 package archery
 
 import scala.collection.mutable.{ArrayBuffer, PriorityQueue}
-import scala.math.{min, max}
 
 /**
  * Some useful constants that we don't want to hardcode.

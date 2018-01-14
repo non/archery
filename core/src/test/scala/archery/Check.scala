@@ -1,16 +1,10 @@
 package archery
 
 import scala.collection.mutable.ArrayBuffer
-import scala.math.{ceil, min, max}
+import scala.math.{min, max}
 import scala.util.Random.{nextGaussian, nextInt}
-import scala.util.Try
-
-import org.scalacheck.Arbitrary._
-import org.scalatest._
-import prop._
-
 import org.scalacheck._
-import Gen._
+
 import Arbitrary.arbitrary
 
 object Check {
@@ -50,7 +44,7 @@ object Check {
 
   implicit def arbjoined[A: Arbitrary]: Arbitrary[Joined[A]] =
     Arbitrary(Gen.oneOf(
-      const(Joined.empty[A]),
+      Gen.const(Joined.empty[A]),
       arbitrary[A].map(Joined(_)),
       arbitrary[Vector[A]].map(Joined.wrap(_))))
 

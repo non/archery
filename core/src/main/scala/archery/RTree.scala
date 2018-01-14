@@ -1,7 +1,6 @@
 package archery
 
-import scala.collection.mutable.{ArrayBuffer, PriorityQueue}
-import scala.math.{min, max}
+import scala.collection.mutable.PriorityQueue
 import scala.util.Try
 
 object RTree {
