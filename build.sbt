@@ -5,7 +5,6 @@ lazy val archerySettings = Seq(
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
   homepage := Some(url("http://github.com/non/archery")),
   scalaVersion := "2.12.4",
-  version := "0.4.0",
   crossScalaVersions := Seq("2.10.6", "2.11.12", "2.12.4"),
   scalacOptions ++= Seq(
     "-deprecation",
