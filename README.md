@@ -22,7 +22,7 @@ If you use SBT, you can include Archery via the following `build.sbt`
 snippet:
 
 ```scala
-libraryDependencies += "com.meetup" %% "archery" % "0.5.0"
+libraryDependencies += "com.meetup" %% "archery" % "0.6.0"
 ```
 
 ### Example Usage
