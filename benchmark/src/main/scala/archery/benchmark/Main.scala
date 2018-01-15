@@ -1,9 +1,7 @@
 package archery
 package benchmark
 
-import scala.collection.mutable.ArrayBuffer
-import scala.math.{min, max}
-import scala.util.Random.{nextFloat, nextInt, nextGaussian}
+import scala.util.Random.nextGaussian
 
 import ichi.bench.Thyme
 
