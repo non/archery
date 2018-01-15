@@ -221,8 +221,8 @@ sealed abstract class Node[A] extends HasGeom { self =>
    *
    * Points on the boundary of the search space will be included.
    */
-  def searchIntersection(space: Box, f: Entry[A] => Boolean): Seq[Entry[A]] =
-    genericSearch(space, space.intersects, f)
+  def searchIntersection(geom: Geom, f: Entry[A] => Boolean): Seq[Entry[A]] =
+    genericSearch(geom, geom.intersects, f)
 
   /**
    * Search for all entries given a search space, spatial checking
@@ -232,8 +232,8 @@ sealed abstract class Node[A] extends HasGeom { self =>
    * `check` function is either space.contains or space.intersects,
    * respectively.
    */
-  def genericSearch(space: Box, check: Geom => Boolean, f: Entry[A] => Boolean): Seq[Entry[A]] =
-    if (!space.isFinite) Nil else {
+  def genericSearch(geom: Geom, check: Geom => Boolean, f: Entry[A] => Boolean): Seq[Entry[A]] =
+    if (!geom.isFinite) Nil else {
       val buf = ArrayBuffer.empty[Entry[A]]
       def recur(node: Node[A]): Unit = node match {
         case Leaf(children, box) =>
@@ -242,10 +242,10 @@ sealed abstract class Node[A] extends HasGeom { self =>
           }
         case Branch(children, box) =>
           children.foreach { c =>
-            if (space.intersects(box)) recur(c)
+            if (geom.intersects(box)) recur(c)
           }
       }
-      if (space.intersects(box)) recur(this)
+      if (geom.intersects(box)) recur(this)
       buf
     }
 
