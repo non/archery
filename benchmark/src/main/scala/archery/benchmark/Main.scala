@@ -19,7 +19,7 @@ object Main {
   val boxes = (0 until num).map(_ => nextBox(radius))
 
   def emit(s: String): Unit =
-    println(s) //scalastyle:ignore
+    println(s)
 
   // generate values in [-5F, 5F], mean 0F with stddev 1F
   def nextF: Float = {

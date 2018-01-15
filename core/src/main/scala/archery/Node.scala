@@ -293,7 +293,7 @@ sealed abstract class Node[A] extends HasGeom { self =>
       case Branch(children, box) =>
         val cs = children.map(node => (node.box.distance(pt), node)).sortBy(_._1)
         cs.foreach { case (d, node) =>
-          if (d >= dist) return result //scalastyle:ignore
+          if (d >= dist) return result
           node.nearest(pt, dist) match {
             case some @ Some((d, _)) =>
               dist = d
@@ -329,7 +329,7 @@ sealed abstract class Node[A] extends HasGeom { self =>
       case Branch(children, box) =>
         val cs = children.map(node => (node.box.distance(pt), node)).sortBy(_._1)
         cs.foreach { case (d, node) =>
-          if (d >= dist) return dist //scalastyle:ignore
+          if (d >= dist) return dist
           dist = node.nearestK(pt, k, dist, pq)
         }
     }
@@ -423,7 +423,7 @@ case class Branch[A](children: Vector[Node[A]], box: Box) extends Node[A] {
 case class Leaf[A](children: Vector[Entry[A]], box: Box) extends Node[A] {
 
   def remove(entry: Entry[A]): Option[(Joined[Entry[A]], Option[Node[A]])] = {
-    if (!box.contains(entry.geom)) return None //scalastyle:ignore
+    if (!box.contains(entry.geom)) return None
     val i = children.indexOf(entry)
     if (i < 0) {
       None

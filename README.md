@@ -73,12 +73,11 @@ After you launch SBT, you can run the following commands:
 
  * `compile` compile the project.
  * `test` run the tests.
- * `scalastyle` run the style-checking.
  * `benchmark/run` run the included timing benchmarks.
  * `console` load a scala REPL with archery on the classpath.
 
-(Travis automatically runs `test` and `scalastyle`, so any issues
-should also be detected when a pull request is opened.)
+(Travis automatically runs `test` so any issues should also be
+detected when a pull request is opened.)
 
 You can generate coverage statistics manually by running the following
 command from the command-line:
