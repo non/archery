@@ -134,33 +134,21 @@ class RTreeCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChec
     }
   }
 
-  property("rtree.searchIntersection works(Box)") {
+  property("rtree.searchIntersection works") {
     forAll { (es: List[Entry[Int]], p: Point) =>
       val rt = build(es)
 
       val box1 = bound(p, 10)
       rt.searchIntersection(box1).toSet shouldBe es.filter(e => box1.intersects(e.geom)).toSet
+      rt.searchIntersection(p).toSet shouldBe es.filter(e => p.intersects(e.geom)).toSet
 
       val f = (e: Entry[Int]) => e.value % 3 != 1
       rt.searchIntersection(box1, f).toSet shouldBe es.filter(e => box1.intersects(e.geom) && f(e)).toSet
+      rt.searchIntersection(p, f).toSet shouldBe es.filter(e => p.intersects(e.geom) && f(e)).toSet
 
       es.foreach { e =>
         val box2 = bound(e.geom, 10)
         rt.searchIntersection(box2).toSet shouldBe es.filter(e => box2.intersects(e.geom)).toSet
-      }
-    }
-  }
-
-  property("rtree.searchIntersection works(Point)") {
-    forAll { (es: List[Entry[Int]], p: Point) =>
-      val rt = build(es)
-
-      rt.searchIntersection(p).toSet shouldBe es.filter(e => p.intersects(e.geom)).toSet
-
-      val f = (e: Entry[Int]) => e.value % 3 != 1
-      rt.searchIntersection(p, f).toSet shouldBe es.filter(e => p.intersects(e.geom) && f(e)).toSet
-
-      es.foreach { e =>
         rt.searchIntersection(p).toSet shouldBe es.filter(e => p.intersects(e.geom)).toSet
       }
     }
