@@ -1,6 +1,7 @@
 package archery
 
-import scala.collection.mutable.{ArrayBuffer, PriorityQueue}
+import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 
 /**
  * Some useful constants that we don't want to hardcode.
@@ -124,7 +125,7 @@ sealed abstract class Node[A] extends HasGeom { self =>
         }
 
       case Branch(children, box) =>
-        assert(children.length > 0)
+        assert(children.nonEmpty)
 
         // here we need to find the "best" child to put the entry
         // into. we define that as the child that needs to add the
@@ -213,7 +214,7 @@ sealed abstract class Node[A] extends HasGeom { self =>
    *
    * Points on the boundary of the search space will be included.
    */
-  def search(space: Box, f: Entry[A] => Boolean): Seq[Entry[A]] =
+  def search(space: Box, f: Entry[A] => Boolean): collection.Seq[Entry[A]] =
     genericSearch(space, space.contains, f)
 
   /**
@@ -221,7 +222,7 @@ sealed abstract class Node[A] extends HasGeom { self =>
    *
    * Points on the boundary of the search space will be included.
    */
-  def searchIntersection(geom: Geom, f: Entry[A] => Boolean): Seq[Entry[A]] =
+  def searchIntersection(geom: Geom, f: Entry[A] => Boolean): collection.Seq[Entry[A]] =
     genericSearch(geom, geom.intersects, f)
 
   /**
@@ -232,7 +233,7 @@ sealed abstract class Node[A] extends HasGeom { self =>
    * `check` function is either space.contains or space.intersects,
    * respectively.
    */
-  def genericSearch(geom: Geom, check: Geom => Boolean, f: Entry[A] => Boolean): Seq[Entry[A]] =
+  def genericSearch(geom: Geom, check: Geom => Boolean, f: Entry[A] => Boolean): collection.Seq[Entry[A]] =
     if (!geom.isFinite) Nil else {
       val buf = ArrayBuffer.empty[Entry[A]]
       def recur(node: Node[A]): Unit = node match {
@@ -292,13 +293,15 @@ sealed abstract class Node[A] extends HasGeom { self =>
         }
       case Branch(children, box) =>
         val cs = children.map(node => (node.box.distance(pt), node)).sortBy(_._1)
-        cs.foreach { case (d, node) =>
-          if (d >= dist) return result
-          node.nearest(pt, dist) match {
-            case some @ Some((d, _)) =>
-              dist = d
-              result = some
-            case None =>
+        cs.find { case (d, node) =>
+          d >= dist || {
+            node.nearest(pt, dist) match {
+              case some @ Some((d, _)) =>
+                dist = d
+                result = some
+              case None =>
+            }
+            false
           }
         }
     }
@@ -312,7 +315,7 @@ sealed abstract class Node[A] extends HasGeom { self =>
    * This method returns the distance of the farthest entry that is
    * still included.
    */
-  def nearestK(pt: Point, k: Int, d0: Double, pq: PriorityQueue[(Double, Entry[A])]): Double = {
+  def nearestK(pt: Point, k: Int, d0: Double, pq: mutable.PriorityQueue[(Double, Entry[A])]): Double = {
     var dist: Double = d0
     this match {
       case Leaf(children, box) =>
@@ -328,9 +331,11 @@ sealed abstract class Node[A] extends HasGeom { self =>
         }
       case Branch(children, box) =>
         val cs = children.map(node => (node.box.distance(pt), node)).sortBy(_._1)
-        cs.foreach { case (d, node) =>
-          if (d >= dist) return dist
-          dist = node.nearestK(pt, k, dist, pq)
+        cs.find { case (d, node) =>
+          d >= dist || {
+            dist = node.nearestK(pt, k, dist, pq)
+            false
+          }
         }
     }
     dist
@@ -554,7 +559,7 @@ object Node {
 
     // find the two geometries that have the most space between them
     // in this particular dimension. the sequence is (lower, upper) points
-    def handleDimension(pairs: IndexedSeq[(Float, Float)]): (Float, Int, Int) = {
+    def handleDimension(pairs: collection.IndexedSeq[(Float, Float)]): (Float, Int, Int) = {
       val (a0, b0) = pairs(0)
       var amin = a0 // min lower coord
       var amax = a0 // max lower coord

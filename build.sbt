@@ -4,8 +4,8 @@ lazy val archerySettings = Seq(
   organization := "org.spire-math",
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
   homepage := Some(url("http://github.com/non/archery")),
-  scalaVersion := "2.12.4",
-  crossScalaVersions := Seq("2.10.6", "2.11.12", "2.12.4"),
+  scalaVersion := "2.13.0",
+  crossScalaVersions := Seq("2.10.7", "2.11.12", "2.12.8", "2.13.0"),
   scalacOptions ++= Seq(
     "-deprecation",
     "-encoding", "UTF-8",
@@ -15,16 +15,18 @@ lazy val archerySettings = Seq(
     "-language:implicitConversions",
     "-language:experimental.macros",
     "-unchecked",
-    "-Xfatal-warnings",
-    "-Xlint",
-    //"-Yno-adapted-args",
-    "-Ywarn-dead-code",
-    //"-Ywarn-numeric-widen",
-    //"-Ywarn-value-discard",
-    "-Xfuture"),
+    "-Ywarn-dead-code"
+  ) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
+    case Some((2, x)) if x < 13 => Seq(
+      "-Xfatal-warnings",
+      "-Xlint",
+      "-Xfuture"
+    )
+    case _ => Seq()
+  }),
   libraryDependencies ++= Seq(
-    "org.scalatest" %% "scalatest" % "3.0.4" % "test",
-    "org.scalacheck" %% "scalacheck" % "1.13.5" % "test"),
+    "org.scalatest" %% "scalatest" % "3.0.8" % "test",
+    "org.scalacheck" %% "scalacheck" % "1.14.0" % "test"),
   releaseCrossBuild := true,
   releasePublishArtifactsAction := PgpKeys.publishSigned.value,
   publishMavenStyle := true,
