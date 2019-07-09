@@ -1,6 +1,6 @@
 package archery
 
-import scala.collection.mutable.PriorityQueue
+import scala.collection.mutable
 import scala.util.Try
 
 object RTree {
@@ -112,25 +112,25 @@ case class RTree[A](root: Node[A], size: Int) {
   /**
    * Return a sequence of all entries found in the given search space.
    */
-  def search(space: Box): Seq[Entry[A]] =
+  def search(space: Box): collection.Seq[Entry[A]] =
     root.search(space, _ => true)
 
   /**
    * Return a sequence of all entries found in the given search space.
    */
-  def search(space: Box, f: Entry[A] => Boolean): Seq[Entry[A]] =
+  def search(space: Box, f: Entry[A] => Boolean): collection.Seq[Entry[A]] =
     root.search(space, f)
 
   /**
    * Return a sequence of all entries intersecting the given search space.
    */
-  def searchIntersection(geom: Geom): Seq[Entry[A]] =
+  def searchIntersection(geom: Geom): collection.Seq[Entry[A]] =
     root.searchIntersection(geom, _ => true)
 
   /**
    * Return a sequence of all entries intersecting the given search space.
    */
-  def searchIntersection(geom: Geom, f: Entry[A] => Boolean): Seq[Entry[A]] =
+  def searchIntersection(geom: Geom, f: Entry[A] => Boolean): collection.Seq[Entry[A]] =
     root.searchIntersection(geom, f)
 
   /**
@@ -155,12 +155,12 @@ case class RTree[A](root: Node[A], size: Int) {
   /**
    * Return a sequence of all entries found in the given search space.
    */
-  def nearestK(pt: Point, k: Int): IndexedSeq[Entry[A]] =
+  def nearestK(pt: Point, k: Int): collection.IndexedSeq[Entry[A]] =
     if (k < 1) {
       Vector.empty
     } else {
-      implicit val ord = Ordering.by[(Double, Entry[A]), Double](_._1)
-      val pq = PriorityQueue.empty[(Double, Entry[A])]
+      implicit val ord: Ordering[(Double, Entry[A])] = Ordering.by[(Double, Entry[A]), Double](_._1)
+      val pq = mutable.PriorityQueue.empty[(Double, Entry[A])]
       root.nearestK(pt, k, Double.PositiveInfinity, pq)
       val arr = new Array[Entry[A]](pq.size)
       var i = arr.length - 1

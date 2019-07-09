@@ -2,11 +2,10 @@ package archery
 
 import org.scalacheck.Arbitrary._
 import org.scalatest._
-import prop._
-
 import Check._
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
-class JoinedCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+class JoinedCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   property("laws for one value") {
     forAll { (j1: Joined[Int]) =>

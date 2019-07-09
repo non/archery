@@ -2,11 +2,10 @@ package archery
 
 import org.scalacheck.Arbitrary._
 import org.scalatest._
-import prop._
-
 import Check._
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
-class GeomCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+class GeomCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   property("point invariants") {
     forAll { (p: Point, g: Geom) =>

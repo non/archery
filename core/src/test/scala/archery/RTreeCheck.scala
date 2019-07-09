@@ -2,17 +2,14 @@ package archery
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Try
-
 import org.scalacheck.Arbitrary._
-import org.scalatest._
-import prop._
-
 import org.scalacheck._
 import Arbitrary.arbitrary
-
 import Check._
+import org.scalatest.{Matchers, PropSpec}
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
-class RTreeCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+class RTreeCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   property("rtree.insert works") {
     forAll { (tpls: List[(Point, Int)]) =>
@@ -202,7 +199,7 @@ class RTreeCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChec
     forAll { (es1: List[Entry[Int]], e: Entry[Int]) =>
       val es2 = ArrayBuffer(es1: _*)
       shuffle(es2)
-      val (rt1, rt2) = (build(es1), build(es2))
+      val (rt1, rt2) = (build(es1), build(es2.toSeq))
       rt1 shouldBe rt2
       rt1.hashCode shouldBe rt2.hashCode
       rt1 should not be (999)
