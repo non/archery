@@ -22,7 +22,7 @@ If you use SBT, you can include Archery via the following `build.sbt`
 snippet:
 
 ```scala
-libraryDependencies += "com.meetup" %% "archery" % "0.6.0"
+libraryDependencies += "org.spire-math" %% "archery" % "0.6.0"
 ```
 
 ### Example Usage
@@ -86,7 +86,7 @@ command from the command-line:
 $ sbt clean coverage test coverageReport
 ```
 
-Open `core/target/scala-2.11/scoverage-report/index.html` in a web
+Open `core/target/scala-2.12/scoverage-report/index.html` in a web
 browser to see local coverage.
 
 Tests are written with [ScalaTest](http://www.scalatest.org/) and use
